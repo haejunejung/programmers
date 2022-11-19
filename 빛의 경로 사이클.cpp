@@ -1,10 +1,83 @@
-/*
-    S = straight
-    L = left
-    R = right
-    격자의 끝을 넘어갈 경우 반대쪽으로 넘어간다
-    종료 조건 : 이미 지나간 방향으로 지나갈때 ?
-*/
+/* 해답 1 */
+#include <string>
+#include <cstring>
+#include <vector>
+#include <algorithm>
+
+using namespace std;
+
+vector<string> copy_grid;
+bool board[501][501][4];
+int Row, Col;
+
+const int dx[] = {0, 0, 1, -1};
+const int dy[] = {1, -1, 0, 0}; 
+const int left[] = {3, 2, 0, 1};
+const int right[] = {2, 3, 1, 0};
+
+int dfs (int sr, int sc, int sd, int r, int c, int in, int len) {
+    if (sc == c && sr == r && sd == in && len != 0) {
+        return len;
+    }
+    
+    board[r][c][in] = true;
+    
+    int out;
+    
+    if (copy_grid[r][c] == 'L') {
+        out = left[in];
+    }
+    else if (copy_grid[r][c] == 'R') {
+        out = right[in];
+    }
+    else {
+        out = in;
+    }
+    
+    int nc = c + dx[out];
+    int nr = r + dy[out];
+    
+    if (nc >= Col) nc = 0;
+    if (nr >= Row) nr = 0;
+    if (nc < 0) nc = Col - 1;
+    if (nr < 0) nr = Row - 1;
+    
+    return dfs (sr, sc, sd, nr, nc, out, len+1);
+}
+
+bool cmp (int &a, int &b) {
+    return a < b;
+}
+
+vector<int> solution(vector<string> grid) {
+    vector<int> answer;
+    
+    copy_grid = grid;
+    memset(board, 0, sizeof(board));
+    Row = grid.size();
+    Col = grid[0].size();
+    
+    int i,j,k;
+    for (i=0; i<Row; ++i) {
+        for (j=0; j<Col; ++j) {
+            for (k=0; k<4; ++k) {
+                if (!board[i][j][k]) {
+                    int res = dfs (i,j,k, i,j,k, 0);
+                    answer.push_back(res);
+                }
+            }
+        }
+    }
+    
+    sort (answer.begin(), answer.end(), cmp);
+    return answer;
+}
+
+
+
+/* 처음 시도했을 때 틀린 코드 */
+
+/* 
 
 #include <iostream>
 #include <string>
@@ -169,3 +242,4 @@ vector<int> solution(vector<string> grid) {
     
     return answer;
 }
+*/
